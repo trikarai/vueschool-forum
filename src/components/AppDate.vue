@@ -1,34 +1,34 @@
 <template>
-  <span :title="humanDate">
-    {{ diffForHuman }}
+  <span :title="humanFriendlyDate">
+    {{ diffForHumans }}
   </span>
 </template>
 
 <script>
-import dayjs from "dayjs";
-import revativeTime from "dayjs/plugin/relativeTime";
-import localizedDate from "dayjs/plugin/localizedFormat";
-dayjs.extend(revativeTime);
-dayjs.extend(localizedDate);
-
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import localizedDate from 'dayjs/plugin/localizedFormat'
+dayjs.extend(relativeTime)
+dayjs.extend(localizedDate)
 export default {
   props: {
     timestamp: {
-      type: Number,
       required: true,
-    },
+      type: [Number, Object]
+    }
   },
   computed: {
-    diffForHuman() {
-      return dayjs.unix(this.timestamp).fromNow();
+    normalizedTimestamp () {
+      return this.timestamp?.seconds || this.timestamp
     },
-    humanDate() {
-      return dayjs.unix(this.timestamp).format("LLL");
+    diffForHumans () {
+      return dayjs.unix(this.normalizedTimestamp).fromNow()
     },
-  },
-  methods: {},
-};
+    humanFriendlyDate () {
+      return dayjs.unix(this.normalizedTimestamp).format('llll')
+    }
+  }
+}
 </script>
-
-<style>
+<style scoped>
 </style>

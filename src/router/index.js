@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import sourceData from '@/data/data.json'
-import { findById } from '@/helpers'
+import store from '@/store'
 
 const Home = () =>
     import(
@@ -70,20 +69,20 @@ const routes = [
         name: "ThreadShow",
         component: ThreadShow,
         props: true,
-        beforeEnter(to, from, next) {
-            const threadExists = findById(sourceData.threads, to.params.id)
-            if (threadExists) {
-                return next()
-            } else {
-                next({
-                    name: 'NotFound',
-                    params: { pathMatch: to.path.substring(1).split('/') },
-                    query: to.query,
-                    hash: to.hash
-                })
+        // beforeEnter(to, from, next) {
+        //     const threadExists = findById(sourceData.threads, to.params.id)
+        //     if (threadExists) {
+        //         return next()
+        //     } else {
+        //         next({
+        //             name: 'NotFound',
+        //             params: { pathMatch: to.path.substring(1).split('/') },
+        //             query: to.query,
+        //             hash: to.hash
+        //         })
 
-            }
-        }
+        //     }
+        // }
     },
     {
         path: '/forum/:forumId/thread/create',
@@ -105,8 +104,7 @@ const routes = [
     }
 ]
 
-
-export default createRouter({
+const router = createRouter({
     history: createWebHistory(),
     routes,
     scrollBehavior(to) {
@@ -116,3 +114,9 @@ export default createRouter({
         return scroll
     }
 })
+
+router.beforeEach(() => {
+    store.dispatch('unsubscribeAllSnapshots')
+})
+
+export default router

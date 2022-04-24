@@ -2,10 +2,10 @@
   <div class="col-full">
     <form @submit.prevent="save">
       <div class="form-group">
-        <textarea name="" id="" cols="30" v-model="text" rows="10"></textarea>
+        <textarea v-model="postCopy.text" name="" id="" cols="30" rows="10" class="form-input"/>
       </div>
       <div class="form-actions">
-        <button class="btn-blue">Submit Post</button>
+        <button class="btn-blue">{{post.id ? 'Update Post' : 'Submit post'}}</button>
       </div>
     </form>
   </div>
@@ -13,25 +13,23 @@
 
 <script>
 export default {
-  name: "PostEditor",
-  data() {
+  props: {
+    post: { type: Object, default: () => ({ text: null }) }
+  },
+  data () {
     return {
-      text: "",
-    };
+      postCopy: { ...this.post }
+    }
   },
   methods: {
-    save() {
-      const post = {
-        text: this.text,
-      };
-
-      this.$emit("save", { post });
-
-      this.text = "";
-    },
-  },
-};
+    save () {
+      this.$emit('save', { post: this.postCopy }) // access under eventData.post
+      this.postCopy.text = ''
+    }
+  }
+}
 </script>
 
-<style>
+<style scoped>
+
 </style>
