@@ -3,9 +3,8 @@ import App from './App.vue'
 
 import store from '@/store'
 import router from '@/router'
-import firebase from 'firebase/compat/app'
+import firebase from 'firebase'
 import firebaseConfig from '@/config/firebase'
-
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig)
 
