@@ -7,8 +7,10 @@
 import CategoryList from "@/components/CategoryList";
 import { mapActions } from "vuex";
 export default {
-  components: { CategoryList },
   name: "PageHome",
+  components: {
+    CategoryList,
+  },
   computed: {
     categories() {
       return this.$store.state.categories;
@@ -25,6 +27,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-</style>

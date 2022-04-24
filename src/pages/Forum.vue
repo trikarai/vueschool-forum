@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div class="col-full push-top">
+  <div v-if="threadLoaded" class="col-full push-top">
     <ThreadList :threads="threads" />
   </div>
 </template>
@@ -30,6 +30,11 @@ export default {
       required: true,
       type: String,
     },
+  },
+  data() {
+    return {
+      threadLoaded: false,
+    };
   },
   computed: {
     forum() {
@@ -49,6 +54,7 @@ export default {
     const forum = await this.fetchForum({ id: this.id });
     const threads = await this.fetchThreads({ ids: forum.threads });
     this.fetchUsers({ ids: threads.map((thread) => thread.userId) });
+    this.threadLoaded = true;
   },
 };
 </script>

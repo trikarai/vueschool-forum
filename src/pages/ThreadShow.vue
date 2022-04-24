@@ -20,6 +20,7 @@
         {{ thread.contributorsCount }} contributors</span
       >
     </p>
+
     <post-list :posts="threadPosts" />
 
     <post-editor @save="addPost" />
@@ -38,8 +39,8 @@ export default {
   },
   props: {
     id: {
-      type: String,
       required: true,
+      type: String,
     },
   },
   computed: {
@@ -58,9 +59,9 @@ export default {
   },
   methods: {
     ...mapActions(["fetchThread", "fetchUsers", "fetchPosts", "createPost"]),
-    addPost(event) {
+    addPost(eventData) {
       const post = {
-        ...event.post,
+        ...eventData.post,
         threadId: this.id,
       };
       this.createPost(post);
@@ -77,6 +78,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-</style>

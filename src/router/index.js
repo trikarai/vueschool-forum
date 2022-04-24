@@ -36,8 +36,8 @@ const NotFound = () =>
 
 const routes = [
     {
-        path: "/",
-        name: "Home",
+        path: '/',
+        name: 'Home',
         component: Home
     },
     {
@@ -59,29 +59,32 @@ const routes = [
         props: true
     },
     {
-        path: "/forum/:id",
-        name: "Forum",
+        path: '/forum/:id',
+        name: 'Forum',
         component: Forum,
         props: true
     },
     {
-        path: "/thread/:id",
-        name: "ThreadShow",
+        path: '/thread/:id',
+        name: 'ThreadShow',
         component: ThreadShow,
-        props: true,
-        // beforeEnter(to, from, next) {
-        //     const threadExists = findById(sourceData.threads, to.params.id)
-        //     if (threadExists) {
-        //         return next()
-        //     } else {
-        //         next({
-        //             name: 'NotFound',
-        //             params: { pathMatch: to.path.substring(1).split('/') },
-        //             query: to.query,
-        //             hash: to.hash
-        //         })
-
-        //     }
+        props: true
+        // beforeEnter (to, from, next) {
+        //   // check if thread exists
+        //   const threadExists = findById(sourceData.threads, to.params.id)
+        //   // if exists continue
+        //   if (threadExists) {
+        //     return next()
+        //   } else {
+        //     next({
+        //       name: 'NotFound',
+        //       params: { pathMatch: to.path.substring(1).split('/') },
+        //       // preserve existing query and hash
+        //       query: to.query,
+        //       hash: to.hash
+        //     })
+        //   }
+        //   // if doesnt exist redirect to not found
         // }
     },
     {
@@ -97,13 +100,11 @@ const routes = [
         props: true
     },
     {
-        path: "/:pathMatch(.*)*",
-        name: "NotFound",
-        component: NotFound,
-        props: true
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFound
     }
 ]
-
 const router = createRouter({
     history: createWebHistory(),
     routes,
@@ -114,7 +115,6 @@ const router = createRouter({
         return scroll
     }
 })
-
 router.beforeEach(() => {
     store.dispatch('unsubscribeAllSnapshots')
 })
