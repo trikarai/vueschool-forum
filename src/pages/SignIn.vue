@@ -6,11 +6,21 @@
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input v-model="form.email" id="email" type="text" class="form-input" />
+          <input
+            v-model="form.email"
+            id="email"
+            type="text"
+            class="form-input"
+          />
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input v-model="form.password" id="password" type="password" class="form-input" />
+          <input
+            v-model="form.password"
+            id="password"
+            type="password"
+            class="form-input"
+          />
         </div>
 
         <div class="push-top">
@@ -18,7 +28,9 @@
         </div>
 
         <div class="form-actions text-right">
-          <router-link :to="{name: 'Register'}">Create an account?</router-link>
+          <router-link :to="{ name: 'Register' }"
+            >Create an account?</router-link
+          >
         </div>
       </form>
 
@@ -32,30 +44,37 @@
 </template>
 <script>
 export default {
-  data () {
+  data() {
     return {
       form: {
-        email: '',
-        password: ''
-      }
-    }
+        email: "",
+        password: "",
+      },
+    };
   },
   methods: {
-    async signIn () {
+    async signIn() {
       try {
-        await this.$store.dispatch('signInWithEmailAndPassword', { ...this.form })
-        this.$router.push('/')
+        await this.$store.dispatch("signInWithEmailAndPassword", {
+          ...this.form,
+        });
+        this.successRedirect();
       } catch (error) {
-        alert(error.message)
+        alert(error.message);
       }
     },
-    async signInWithGoogle () {
-      await this.$store.dispatch('signInWithGoogle')
-      this.$router.push('/')
-    }
+    async signInWithGoogle() {
+      await this.$store.dispatch("signInWithGoogle");
+      this.successRedirect();
+    },
   },
-  created () {
-    this.$emit('ready')
-  }
-}
+  created() {
+    this.$emit("ready");
+  },
+  successRedirect() {
+    console.log("redirecting");
+    const redirectTo = this.$route.query.redirectTo || { name: "Home" };
+    this.$router.push(redirectTo);
+  },
+};
 </script>
