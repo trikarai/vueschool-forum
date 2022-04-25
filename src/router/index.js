@@ -29,6 +29,14 @@ const ThreadShow = () =>
     import(
     /* webpackChunkName: "Thread" */ "@/pages/ThreadShow"
     );
+const Register = () =>
+    import(
+    /* webpackChunkName: "Auth" */ "@/pages/Register"
+    );
+const SignIn = () =>
+    import(
+    /* webpackChunkName: "Auth" */ "@/pages/SignIn"
+    );
 const NotFound = () =>
     import(
     /* webpackChunkName: "App" */ "@/pages/NotFound"
@@ -98,6 +106,16 @@ const routes = [
         name: 'ThreadEdit',
         component: ThreadEdit,
         props: true
+    },
+    {
+        path: '/register',
+        name: 'Register',
+        component: Register
+    },
+    {
+        path: '/signin',
+        name: 'SignIn',
+        component: SignIn
     },
     {
         path: '/:pathMatch(.*)*',

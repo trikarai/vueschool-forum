@@ -2,7 +2,7 @@
 import firebase from 'firebase'
 import { findById, docToResource } from '@/helpers'
 export default {
-  async createPost ({ commit, state }, post) {
+  async createPost({ commit, state }, post) {
     post.userId = state.authId
     post.publishedAt = firebase.firestore.FieldValue.serverTimestamp()
     const batch = firebase.firestore().batch()
@@ -23,7 +23,7 @@ export default {
     commit('appendPostToThread', { childId: newPost.id, parentId: post.threadId }) // append post to thread
     commit('appendContributorToThread', { childId: state.authId, parentId: post.threadId })
   },
-  async updatePost ({ commit, state }, { text, id }) {
+  async updatePost({ commit, state }, { text, id }) {
     const post = {
       text,
       edited: {
@@ -37,7 +37,7 @@ export default {
     const updatedPost = await postRef.get()
     commit('setItem', { resource: 'posts', item: updatedPost })
   },
-  async createThread ({ commit, state, dispatch }, { text, title, forumId }) {
+  async createThread({ commit, state, dispatch }, { text, title, forumId }) {
     const userId = state.authId
     const publishedAt = firebase.firestore.FieldValue.serverTimestamp()
     const threadRef = firebase.firestore().collection('threads').doc()
@@ -62,7 +62,7 @@ export default {
     await dispatch('createPost', { text, threadId: threadRef.id })
     return findById(state.threads, threadRef.id)
   },
-  async updateThread ({ commit, state }, { title, text, id }) {
+  async updateThread({ commit, state }, { title, text, id }) {
     const thread = findById(state.threads, id)
     const post = findById(state.posts, thread.posts[0])
     let newThread = { ...thread, title }
@@ -79,7 +79,40 @@ export default {
     commit('setItem', { resource: 'posts', item: newPost })
     return docToResource(newThread)
   },
-  updateUser ({ commit }, user) {
+  async registerUserWithEmailAndPassword({ dispatch }, { avatar = null, email, name, username, password }) {
+    const result = await firebase.auth().createUserWithEmailAndPassword(email, password)
+    await dispatch('createUser', { id: result.user.uid, email, name, username, avatar })
+  },
+  signInWithEmailAndPassword(context, { email, password }) {
+    console.log(email, password)
+    return firebase.auth().signInWithEmailAndPassword(email, password)
+  },
+  async signInWithGoogle({ dispatch }) {
+    const provider = new firebase.auth.GoogleAuthProvider()
+    const response = await firebase.auth().signInWithPopup(provider)
+    const user = response.user
+    const userRef = firebase.firestore().collection('users').doc(user.uid)
+    const userDoc = await userRef.get()
+    if (!userDoc.exists) {
+      return dispatch('createUser', { id: user.uid, name: user.displayName, email: user.email, username: user.email, avatar: user.photoURL })
+    }
+  },
+  async signOut({ commit }) {
+    await firebase.auth().signOut()
+    commit('setAuthId', null)
+  },
+  async createUser({ commit }, { id, email, name, username, avatar = null }) {
+    const registeredAt = firebase.firestore.FieldValue.serverTimestamp()
+    const usernameLower = username.toLowerCase()
+    email = email.toLowerCase()
+    const user = { avatar, email, name, username, usernameLower, registeredAt }
+    const userRef = await firebase.firestore().collection('users').doc(id)
+    userRef.set(user)
+    const newUser = await userRef.get()
+    commit('setItem', { resource: 'users', item: newUser })
+    return docToResource(newUser)
+  },
+  updateUser({ commit }, user) {
     commit('setItem', { resource: 'users', item: user })
   },
   // ---------------------------------------
@@ -90,11 +123,24 @@ export default {
   fetchThread: ({ dispatch }, { id }) => dispatch('fetchItem', { emoji: '📄', resource: 'threads', id }),
   fetchPost: ({ dispatch }, { id }) => dispatch('fetchItem', { emoji: '💬', resource: 'posts', id }),
   fetchUser: ({ dispatch }, { id }) => dispatch('fetchItem', { emoji: '🙋', resource: 'users', id }),
-  fetchAuthUser: ({ dispatch, state }) => dispatch('fetchItem', { emoji: '🙋', resource: 'users', id: state.authId }),
+  fetchAuthUser: ({ dispatch, state, commit }) => {
+    const userId = firebase.auth().currentUser?.uid
+    if (!userId) return
+    dispatch('fetchItem', {
+      emoji: '🙋',
+      resource: 'users',
+      id: userId,
+      handleUnsubscribe: (unsubscribe) => {
+        commit('setAuthUserUnsubscribe', unsubscribe)
+      }
+    })
+    dispatch('fetchItem', { emoji: '🙋', resource: 'users', id: userId })
+    commit('setAuthId', userId)
+  },
   // ---------------------------------------
   // Fetch All of a Resource
   // ---------------------------------------
-  fetchAllCategories ({ commit }) {
+  fetchAllCategories({ commit }) {
     console.log('🔥', '🏷', 'all')
     return new Promise((resolve) => {
       firebase.firestore().collection('categories').onSnapshot((querySnapshot) => {
@@ -115,8 +161,7 @@ export default {
   fetchThreads: ({ dispatch }, { ids }) => dispatch('fetchItems', { resource: 'threads', ids, emoji: '📄' }),
   fetchPosts: ({ dispatch }, { ids }) => dispatch('fetchItems', { resource: 'posts', ids, emoji: '💬' }),
   fetchUsers: ({ dispatch }, { ids }) => dispatch('fetchItems', { resource: 'users', ids, emoji: '🙋' }),
-
-  fetchItem ({ state, commit }, { id, emoji, resource }) {
+  fetchItem({ state, commit }, { id, emoji, resource, handleUnsubscribe = null }) {
     console.log('🔥', emoji, id)
     return new Promise((resolve) => {
       const unsubscribe = firebase.firestore().collection(resource).doc(id).onSnapshot((doc) => {
@@ -124,14 +169,24 @@ export default {
         commit('setItem', { resource, item })
         resolve(item)
       })
-      commit('appendUnsubscribe', { unsubscribe })
+      if (handleUnsubscribe) {
+        handleUnsubscribe(unsubscribe)
+      } else {
+        commit('appendUnsubscribe', { unsubscribe })
+      }
     })
   },
-  fetchItems ({ dispatch }, { ids, resource, emoji }) {
+  fetchItems({ dispatch }, { ids, resource, emoji }) {
     return Promise.all(ids.map(id => dispatch('fetchItem', { id, resource, emoji })))
   },
-  async unsubscribeAllSnapshots ({ state, commit }) {
+  async unsubscribeAllSnapshots({ state, commit }) {
     state.unsubscribes.forEach(unsubscribe => unsubscribe())
     commit('clearAllUnsubscribes')
+  },
+  async unsubscribeAuthUserSnapshot({ state, commit }) {
+    if (state.authUserUnsubscribe) {
+      state.authUserUnsubscribe()
+      commit('setAuthUserUnsubscribe', null)
+    }
   }
 }
