@@ -22,11 +22,12 @@ export default {
   },
   computed: {
     categories() {
-      return this.$store.state.categories;
+      return this.$store.state.categories.items;
     },
   },
   methods: {
-    ...mapActions(["fetchAllCategories", "fetchForums"]),
+    ...mapActions("categories", ["fetchAllCategories"]),
+    ...mapActions("forums", ["fetchForums"]),
   },
   async created() {
     const categories = await this.fetchAllCategories();

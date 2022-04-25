@@ -1,7 +1,7 @@
 <template>
   <the-navbar />
   <div class="container">
-    <router-view v-show="showPage" @ready="onPageReady" :key="$route.path"/>
+    <router-view v-show="showPage" @ready="onPageReady" :key="$route.path" />
     <AppSpinner v-show="!showPage" />
   </div>
 </template>
@@ -19,7 +19,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["fetchAuthUser"]),
+    ...mapActions("auth", ["fetchAuthUser"]),
     onPageReady() {
       this.showPage = true;
       NProgress.done();
@@ -42,7 +42,7 @@ export default {
 <style>
 @import "assets/style.css";
 @import "~nprogress/nprogress.css";
-#nprogress .bar{
-  background: #57AD8D !important;
+#nprogress .bar {
+  background: #57ad8d !important;
 }
 </style>

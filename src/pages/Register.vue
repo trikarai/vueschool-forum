@@ -11,22 +11,42 @@
 
         <div class="form-group">
           <label for="username">Username</label>
-          <input v-model="form.username" id="username" type="text" class="form-input" />
+          <input
+            v-model="form.username"
+            id="username"
+            type="text"
+            class="form-input"
+          />
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input v-model="form.email" id="email" type="email" class="form-input" />
+          <input
+            v-model="form.email"
+            id="email"
+            type="email"
+            class="form-input"
+          />
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input v-model="form.password" id="password" type="password" class="form-input" />
+          <input
+            v-model="form.password"
+            id="password"
+            type="password"
+            class="form-input"
+          />
         </div>
 
         <div class="form-group">
           <label for="avatar">Avatar</label>
-          <input v-model="form.avatar" id="avatar" type="text" class="form-input" />
+          <input
+            v-model="form.avatar"
+            id="avatar"
+            type="text"
+            class="form-input"
+          />
         </div>
 
         <div class="form-actions">
@@ -43,29 +63,32 @@
 </template>
 <script>
 export default {
-  data () {
+  data() {
     return {
       form: {
-        name: '',
-        username: '',
-        email: '',
-        password: '',
-        avatar: ''
-      }
-    }
+        name: "",
+        username: "",
+        email: "",
+        password: "",
+        avatar: "",
+      },
+    };
   },
   methods: {
-    async register () {
-      await this.$store.dispatch('registerUserWithEmailAndPassword', this.form)
-      this.$router.push('/')
+    async register() {
+      await this.$store.dispatch(
+        "auth/registerUserWithEmailAndPassword",
+        this.form
+      );
+      this.$router.push("/");
     },
-    async registerWithGoogle () {
-      await this.$store.dispatch('signInWithGoogle')
-      this.$router.push('/')
-    }
+    async registerWithGoogle() {
+      await this.$store.dispatch("auth/signInWithGoogle");
+      this.$router.push("/");
+    },
   },
-  created () {
-    this.$emit('ready')
-  }
-}
+  created() {
+    this.$emit("ready");
+  },
+};
 </script>
