@@ -154,6 +154,12 @@ export default {
     dispatch('fetchItem', { emoji: '🙋', resource: 'users', id: userId })
     commit('setAuthId', userId)
   },
+  async fetchAuthUsersPosts ({ commit, state }) {
+    const posts = await firebase.firestore().collection('posts').where('userId', '==', state.authId).get()
+    posts.forEach(item => {
+      commit('setItem', { resource: 'posts', item })
+    })
+  },
   // ---------------------------------------
   // Fetch All of a Resource
   // ---------------------------------------
