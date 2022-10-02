@@ -39,13 +39,13 @@
       </div>
     </div>
 
-    <div class="pagination">
+    <!-- <div class="pagination">
       <button class="btn-circle" disabled="">
         <i class="fa fa-angle-left"></i>
       </button>
       1 of 3
       <button class="btn-circle"><i class="fa fa-angle-right"></i></button>
-    </div>
+    </div> -->
   </div>
 </template>
 
